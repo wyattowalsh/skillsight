@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtualenv
+.venv/
+
+# Data outputs
+data/
+
+# Node / frontend
+web/node_modules/
+web/dist/
+
+# Worker
+worker/.wrangler/
+
+# Worktrees
+.worktrees/
+
+# OS
+.DS_Store

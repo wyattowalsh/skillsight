@@ -254,4 +254,238 @@ describe("api client runtime caching", () => {
     expect(result.items[0]).not.toHaveProperty("description");
     expect(result.items[0]).not.toHaveProperty("platform_installs");
   });
+
+  it("loads wave-a analytics using manifest path overrides", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/data/v1/latest.json")) {
+        return jsonResponse({
+          body: {
+            format_version: 1,
+            snapshot_date: "2025-01-15",
+            generated_at: "2025-01-15T00:00:00Z",
+            page_size: 12,
+            sort_modes: ["installs", "weekly", "name"],
+            paths: {
+              stats_wave_a: "/custom/wave-a.json",
+            },
+          },
+        });
+      }
+      if (url.includes("/custom/wave-a.json")) {
+        return jsonResponse({
+          body: {
+            snapshot_date: "2025-01-15",
+            previous_snapshot_date: "2025-01-14",
+            rank_turbulence: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: "2025-01-14",
+              kpis: {
+                matched_skill_count: 0,
+                median_abs_rank_delta: null,
+                p90_abs_rank_delta: null,
+                improved_count: 0,
+                declined_count: 0,
+                unchanged_count: 0,
+              },
+              buckets: [],
+              top_gainers: [],
+              top_losers: [],
+            },
+            momentum_vs_scale: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: "2025-01-14",
+              kpis: {
+                positive_momentum_pct: null,
+                median_delta_installs: null,
+                p90_delta_installs: null,
+              },
+              points: [],
+            },
+            long_tail_power_curve: {
+              snapshot_date: "2025-01-15",
+              kpis: {
+                total_installs_sum: 0,
+                top10_share_pct: 0,
+                top50_share_pct: 0,
+                top100_share_pct: 0,
+              },
+              curve: [],
+            },
+            source_effectiveness: {
+              snapshot_date: "2025-01-15",
+              kpis: {
+                source_count: 0,
+                dominant_source: null,
+                dominant_source_share_pct: null,
+              },
+              sources: [],
+            },
+            daily_change_cards: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: "2025-01-14",
+              compared_skill_count: 0,
+              cards: [],
+            },
+            limitations: [],
+          },
+        });
+      }
+      throw new Error(`Unexpected URL ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const api = await import("./api");
+    const analytics = await api.getWaveAAnalytics();
+
+    expect(analytics.snapshot_date).toBe("2025-01-15");
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/custom/wave-a.json"));
+  });
+
+  it("loads enrichment stats using manifest path overrides", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/data/v1/latest.json")) {
+        return jsonResponse({
+          body: {
+            format_version: 1,
+            snapshot_date: "2025-01-15",
+            generated_at: "2025-01-15T00:00:00Z",
+            page_size: 12,
+            sort_modes: ["installs", "weekly", "name"],
+            paths: {
+              stats_enrichment: "/custom/enrichment.json",
+            },
+          },
+        });
+      }
+      if (url.includes("/custom/enrichment.json")) {
+        return jsonResponse({
+          body: {
+            snapshot_date: "2025-01-15",
+            total_skills: 100,
+            history_mode: "previous_snapshot",
+            history_snapshots_considered: 1,
+            backfilled: {
+              platform_installs: 3,
+              categories: 4,
+              first_seen_date: 5,
+            },
+            coverage: {
+              platform_installs: { count: 20, pct: 20 },
+              categories: { count: 50, pct: 50 },
+              first_seen_date: { count: 80, pct: 80 },
+            },
+            ready: {
+              platform_installs: true,
+              categories: true,
+              first_seen_date: true,
+              wave_b: true,
+            },
+          },
+        });
+      }
+      throw new Error(`Unexpected URL ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const api = await import("./api");
+    const enrichment = await api.getEnrichmentStats();
+
+    expect(enrichment.total_skills).toBe(100);
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/custom/enrichment.json"));
+  });
+
+  it("normalizes manifest paths that already include /data/v1", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/data/v1/latest.json")) {
+        return jsonResponse({
+          body: {
+            format_version: 1,
+            snapshot_date: "2025-01-15",
+            generated_at: "2025-01-15T00:00:00Z",
+            page_size: 12,
+            sort_modes: ["installs", "weekly", "name"],
+            paths: {
+              stats_wave_a: "/data/v1/snapshots/2025-01-15/stats/wave-a.json",
+            },
+          },
+        });
+      }
+      if (url.includes("/data/v1/snapshots/2025-01-15/stats/wave-a.json")) {
+        if (url.includes("/data/v1/data/v1/")) {
+          throw new Error(`Double-prefixed path ${url}`);
+        }
+        return jsonResponse({
+          body: {
+            snapshot_date: "2025-01-15",
+            previous_snapshot_date: null,
+            rank_turbulence: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: null,
+              kpis: {
+                matched_skill_count: 0,
+                median_abs_rank_delta: null,
+                p90_abs_rank_delta: null,
+                improved_count: 0,
+                declined_count: 0,
+                unchanged_count: 0,
+              },
+              buckets: [],
+              top_gainers: [],
+              top_losers: [],
+            },
+            momentum_vs_scale: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: null,
+              kpis: {
+                positive_momentum_pct: null,
+                median_delta_installs: null,
+                p90_delta_installs: null,
+              },
+              points: [],
+            },
+            long_tail_power_curve: {
+              snapshot_date: "2025-01-15",
+              kpis: {
+                total_installs_sum: 0,
+                top10_share_pct: 0,
+                top50_share_pct: 0,
+                top100_share_pct: 0,
+              },
+              curve: [],
+            },
+            source_effectiveness: {
+              snapshot_date: "2025-01-15",
+              kpis: {
+                source_count: 0,
+                dominant_source: null,
+                dominant_source_share_pct: null,
+              },
+              sources: [],
+            },
+            daily_change_cards: {
+              snapshot_date: "2025-01-15",
+              previous_snapshot_date: null,
+              compared_skill_count: 0,
+              cards: [],
+            },
+            limitations: [],
+          },
+        });
+      }
+      throw new Error(`Unexpected URL ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const api = await import("./api");
+    const analytics = await api.getWaveAAnalytics();
+
+    expect(analytics.snapshot_date).toBe("2025-01-15");
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/data/v1/snapshots/2025-01-15/stats/wave-a.json"),
+    );
+    expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining("/data/v1/data/v1/"));
+  });
 });

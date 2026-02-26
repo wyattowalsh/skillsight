@@ -2,6 +2,7 @@ import metricsMock from "@/mocks/metrics.json";
 import skillDetailMock from "@/mocks/skill_detail.json";
 import skillsListMock from "@/mocks/skills_list.json";
 import statsSummaryMock from "@/mocks/stats_summary.json";
+import statsWaveAMock from "@/mocks/stats_wave_a.json";
 import type { PlatformInstalls, SkillListItem, SkillRecord } from "@/contracts/types";
 
 type SortMode = "installs" | "weekly" | "name";
@@ -17,6 +18,134 @@ type StatsSummary = {
   total_skills: number;
   total_repos: number;
   snapshot_date: string;
+};
+
+type EnrichmentStats = {
+  snapshot_date: string;
+  total_skills: number;
+  history_mode: string;
+  history_snapshots_considered: number;
+  backfilled: {
+    platform_installs: number;
+    categories: number;
+    first_seen_date: number;
+  };
+  coverage: {
+    platform_installs: { count: number; pct: number };
+    categories: { count: number; pct: number };
+    first_seen_date: { count: number; pct: number };
+  };
+  ready: {
+    platform_installs: boolean;
+    categories: boolean;
+    first_seen_date: boolean;
+    wave_b: boolean;
+  };
+};
+
+type RankTurbulenceMover = {
+  id: string;
+  name: string;
+  prev_rank: number;
+  curr_rank: number;
+  delta_rank: number;
+  total_installs: number | null;
+};
+
+type RankTurbulenceChart = {
+  snapshot_date: string;
+  previous_snapshot_date: string | null;
+  kpis: {
+    matched_skill_count: number;
+    median_abs_rank_delta: number | null;
+    p90_abs_rank_delta: number | null;
+    improved_count: number;
+    declined_count: number;
+    unchanged_count: number;
+  };
+  buckets: Array<{ bucket: string; count: number }>;
+  top_gainers: RankTurbulenceMover[];
+  top_losers: RankTurbulenceMover[];
+};
+
+type MomentumVsScalePoint = {
+  id: string;
+  name: string;
+  rank_at_fetch: number | null;
+  total_installs: number;
+  delta_installs: number | null;
+  delta_pct: number | null;
+};
+
+type MomentumVsScaleChart = {
+  snapshot_date: string;
+  previous_snapshot_date: string | null;
+  kpis: {
+    positive_momentum_pct: number | null;
+    median_delta_installs: number | null;
+    p90_delta_installs: number | null;
+  };
+  points: MomentumVsScalePoint[];
+};
+
+type LongTailPowerCurveChart = {
+  snapshot_date: string;
+  kpis: {
+    total_installs_sum: number;
+    top10_share_pct: number;
+    top50_share_pct: number;
+    top100_share_pct: number;
+  };
+  curve: Array<{
+    rank: number;
+    installs: number;
+    cumulative_installs: number;
+    cumulative_share_pct: number;
+  }>;
+};
+
+type SourceEffectivenessChart = {
+  snapshot_date: string;
+  kpis: {
+    source_count: number;
+    dominant_source: string | null;
+    dominant_source_share_pct: number | null;
+  };
+  sources: Array<{
+    source: string;
+    skill_count: number;
+    skill_share_pct: number;
+    total_installs: number;
+    median_installs: number;
+  }>;
+};
+
+type DailyChangeCards = {
+  snapshot_date: string;
+  previous_snapshot_date: string | null;
+  compared_skill_count: number;
+  cards: Array<{
+    id:
+      | "net_install_delta"
+      | "new_skills_count"
+      | "dropped_skills_count"
+      | "gainers_count"
+      | "decliners_count"
+      | "unchanged_count";
+    label: string;
+    value: number;
+  }>;
+};
+
+type WaveAAnalyticsResponse = {
+  snapshot_date: string;
+  previous_snapshot_date: string | null;
+  rank_turbulence: RankTurbulenceChart;
+  momentum_vs_scale: MomentumVsScaleChart;
+  long_tail_power_curve: LongTailPowerCurveChart;
+  source_effectiveness: SourceEffectivenessChart;
+  daily_change_cards: DailyChangeCards;
+  limitations: string[];
 };
 
 type MetricItem = {
@@ -38,6 +167,10 @@ type StaticLatestManifest = {
   generated_at: string;
   page_size: number;
   sort_modes: SortMode[];
+  paths?: {
+    stats_wave_a?: string;
+    stats_enrichment?: string;
+  };
   counts?: {
     total_skills: number;
     total_repos: number;
@@ -106,10 +239,13 @@ function buildUrl(base: string, path: string): string {
 }
 
 function buildStaticPath(path: string): string {
-  if (DATA_ROOT.startsWith("http")) {
-    return `${DATA_ROOT}${path}`;
+  if (/^https?:\/\//.test(path)) {
+    return path;
   }
-  return `${DATA_ROOT}${path}`;
+
+  // Manifest path templates may already include the static export prefix.
+  const normalizedPath = path.startsWith("/data/v1/") ? path.slice("/data/v1".length) : path;
+  return `${DATA_ROOT}${normalizedPath.startsWith("/") ? "" : "/"}${normalizedPath}`;
 }
 
 function encodeSkillPath(id: string): { owner: string; repo: string; skillId: string } {
@@ -293,6 +429,49 @@ export async function getStatsSummary(): Promise<StatsSummary> {
   return fetchCachedJson<StatsSummary>(buildStaticPath(`/snapshots/${manifest.snapshot_date}/stats/summary.json`));
 }
 
+export async function getWaveAAnalytics(): Promise<WaveAAnalyticsResponse> {
+  if (USE_MOCKS) {
+    return statsWaveAMock as WaveAAnalyticsResponse;
+  }
+
+  const manifest = await getLatestManifest();
+  const statsWaveAPath = manifest.paths?.stats_wave_a ?? `/snapshots/${manifest.snapshot_date}/stats/wave-a.json`;
+  return fetchCachedJson<WaveAAnalyticsResponse>(buildStaticPath(statsWaveAPath));
+}
+
+export async function getEnrichmentStats(): Promise<EnrichmentStats> {
+  if (USE_MOCKS) {
+    const summary = statsSummaryMock as StatsSummary;
+    return {
+      snapshot_date: summary.snapshot_date,
+      total_skills: summary.total_skills,
+      history_mode: "previous_snapshot",
+      history_snapshots_considered: 1,
+      backfilled: {
+        platform_installs: 0,
+        categories: 0,
+        first_seen_date: 0,
+      },
+      coverage: {
+        platform_installs: { count: 0, pct: 0 },
+        categories: { count: 0, pct: 0 },
+        first_seen_date: { count: 0, pct: 0 },
+      },
+      ready: {
+        platform_installs: false,
+        categories: false,
+        first_seen_date: false,
+        wave_b: false,
+      },
+    };
+  }
+
+  const manifest = await getLatestManifest();
+  const enrichmentPath =
+    manifest.paths?.stats_enrichment ?? `/snapshots/${manifest.snapshot_date}/stats/enrichment.json`;
+  return fetchCachedJson<EnrichmentStats>(buildStaticPath(enrichmentPath));
+}
+
 export async function getMetrics(id: string): Promise<MetricsResponse> {
   if (USE_MOCKS) {
     return {
@@ -308,4 +487,16 @@ export async function getMetrics(id: string): Promise<MetricsResponse> {
   );
 }
 
-export type { MetricItem, MetricsResponse, SkillListResponse, SortMode, StatsSummary };
+export type {
+  EnrichmentStats,
+  DailyChangeCards,
+  MetricItem,
+  MetricsResponse,
+  MomentumVsScaleChart,
+  RankTurbulenceChart,
+  SkillListResponse,
+  SortMode,
+  SourceEffectivenessChart,
+  StatsSummary,
+  WaveAAnalyticsResponse,
+};

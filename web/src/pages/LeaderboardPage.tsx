@@ -22,7 +22,7 @@ export default function LeaderboardPage() {
   const [searchInput, setSearchInput] = useState("");
   const [sort, setSort] = useState<SortMode>("installs");
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(200);
+  const [pageSize] = useState(12);
   const query = useDebouncedValue(searchInput, 300);
   const { stats, skills, selectedId, setSelectedId, selectedSkill, metrics, error, total } = useLeaderboardData({
     page,

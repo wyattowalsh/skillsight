@@ -1,0 +1,148 @@
+{
+  "snapshot_date": "2026-02-17",
+  "previous_snapshot_date": "2026-02-16",
+  "rank_turbulence": {
+    "snapshot_date": "2026-02-17",
+    "previous_snapshot_date": "2026-02-16",
+    "kpis": {
+      "matched_skill_count": 3,
+      "median_abs_rank_delta": 1,
+      "p90_abs_rank_delta": 2,
+      "improved_count": 1,
+      "declined_count": 1,
+      "unchanged_count": 1
+    },
+    "buckets": [
+      {"bucket": "0", "count": 1},
+      {"bucket": "1-3", "count": 2},
+      {"bucket": "4-10", "count": 0},
+      {"bucket": "11-25", "count": 0},
+      {"bucket": "26+", "count": 0}
+    ],
+    "top_gainers": [
+      {
+        "id": "vercel-labs/skills/find-skills",
+        "name": "find-skills",
+        "prev_rank": 2,
+        "curr_rank": 1,
+        "delta_rank": 1,
+        "total_installs": 12345
+      }
+    ],
+    "top_losers": [
+      {
+        "id": "acme/skills/review-pr",
+        "name": "review-pr",
+        "prev_rank": 1,
+        "curr_rank": 3,
+        "delta_rank": -2,
+        "total_installs": 10120
+      }
+    ]
+  },
+  "momentum_vs_scale": {
+    "snapshot_date": "2026-02-17",
+    "previous_snapshot_date": "2026-02-16",
+    "kpis": {
+      "positive_momentum_pct": 66.7,
+      "median_delta_installs": 110,
+      "p90_delta_installs": 190
+    },
+    "points": [
+      {
+        "id": "vercel-labs/skills/find-skills",
+        "name": "find-skills",
+        "rank_at_fetch": 1,
+        "total_installs": 12345,
+        "delta_installs": 190,
+        "delta_pct": 1.56
+      },
+      {
+        "id": "acme/skills/review-pr",
+        "name": "review-pr",
+        "rank_at_fetch": 3,
+        "total_installs": 10120,
+        "delta_installs": -40,
+        "delta_pct": -0.39
+      },
+      {
+        "id": "open-source/skills/agent-conventions",
+        "name": "agent-conventions",
+        "rank_at_fetch": 2,
+        "total_installs": 11700,
+        "delta_installs": 30,
+        "delta_pct": 0.26
+      }
+    ]
+  },
+  "long_tail_power_curve": {
+    "snapshot_date": "2026-02-17",
+    "kpis": {
+      "total_installs_sum": 34165,
+      "top10_share_pct": 100,
+      "top50_share_pct": 100,
+      "top100_share_pct": 100
+    },
+    "curve": [
+      {
+        "rank": 1,
+        "installs": 12345,
+        "cumulative_installs": 12345,
+        "cumulative_share_pct": 36.13
+      },
+      {
+        "rank": 2,
+        "installs": 11700,
+        "cumulative_installs": 24045,
+        "cumulative_share_pct": 70.38
+      },
+      {
+        "rank": 3,
+        "installs": 10120,
+        "cumulative_installs": 34165,
+        "cumulative_share_pct": 100
+      }
+    ]
+  },
+  "source_effectiveness": {
+    "snapshot_date": "2026-02-17",
+    "kpis": {
+      "source_count": 2,
+      "dominant_source": "all_time_api",
+      "dominant_source_share_pct": 67.03
+    },
+    "sources": [
+      {
+        "source": "all_time_api",
+        "skill_count": 2,
+        "skill_share_pct": 66.67,
+        "total_installs": 22900,
+        "median_installs": 11450
+      },
+      {
+        "source": "search_api",
+        "skill_count": 1,
+        "skill_share_pct": 33.33,
+        "total_installs": 11265,
+        "median_installs": 11265
+      }
+    ]
+  },
+  "daily_change_cards": {
+    "snapshot_date": "2026-02-17",
+    "previous_snapshot_date": "2026-02-16",
+    "compared_skill_count": 3,
+    "cards": [
+      {"id": "net_install_delta", "label": "Net install delta", "value": 180},
+      {"id": "new_skills_count", "label": "New skills", "value": 0},
+      {"id": "dropped_skills_count", "label": "Dropped skills", "value": 0},
+      {"id": "gainers_count", "label": "Gainers", "value": 2},
+      {"id": "decliners_count", "label": "Decliners", "value": 1},
+      {"id": "unchanged_count", "label": "Unchanged", "value": 0}
+    ]
+  },
+  "limitations": [
+    "Mock analytics payload for local UI previews.",
+    "Real values are generated nightly from deduped skills_full snapshots."
+  ]
+}

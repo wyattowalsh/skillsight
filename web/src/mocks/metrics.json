@@ -1,0 +1,19 @@
+{
+  "id": "vercel-labs/skills/find-skills",
+  "items": [
+    {
+      "id": "vercel-labs/skills/find-skills",
+      "snapshot_date": "2026-02-16",
+      "total_installs": 12000,
+      "weekly_installs": 650,
+      "platform_installs": {"codex": 240, "opencode": 290}
+    },
+    {
+      "id": "vercel-labs/skills/find-skills",
+      "snapshot_date": "2026-02-17",
+      "total_installs": 12345,
+      "weekly_installs": 678,
+      "platform_installs": {"codex": 250, "opencode": 300}
+    }
+  ]
+}

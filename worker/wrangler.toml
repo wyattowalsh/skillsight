@@ -1,0 +1,7 @@
+name = "skillsight-worker"
+main = "src/index.ts"
+compatibility_date = "2026-02-17"
+
+[[r2_buckets]]
+binding = "SKILLSIGHT_DATA"
+bucket_name = "skillsight-data"

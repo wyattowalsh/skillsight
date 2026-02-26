@@ -18,9 +18,18 @@ web/dist/
 
 # Worker
 worker/.wrangler/
+worker/node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
 
 # Worktrees
 .worktrees/
+
+# Claude Code
+.claude/
 
 # OS
 .DS_Store

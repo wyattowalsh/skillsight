@@ -1,0 +1,13 @@
+name: skillsight
+prefect-version: "3"
+build: null
+push: null
+pull: null
+deployments:
+  - name: daily
+    entrypoint: src/skillsight/pipeline/orchestrator.py:skillsight_pipeline
+    work_pool:
+      name: skillsight-pool
+    schedule:
+      cron: "0 6 * * *"
+      timezone: "UTC"

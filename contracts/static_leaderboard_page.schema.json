@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillsight.dev/contracts/static_leaderboard_page.schema.json",
+  "title": "StaticLeaderboardPage",
+  "type": "object",
+  "required": ["snapshot_date", "sort", "page", "page_size", "total", "items"],
+  "properties": {
+    "snapshot_date": { "type": "string", "format": "date" },
+    "sort": { "type": "string", "enum": ["installs", "weekly", "name"] },
+    "page": { "type": "integer", "minimum": 1 },
+    "page_size": { "type": "integer", "minimum": 1 },
+    "total": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "./static_skill_list_item.schema.json" }
+    }
+  },
+  "additionalProperties": false
+}

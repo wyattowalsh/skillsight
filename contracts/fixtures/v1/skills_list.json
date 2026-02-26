@@ -1,0 +1,32 @@
+{
+  "items": [
+    {
+      "id": "vercel-labs/skills/find-skills",
+      "skill_id": "find-skills",
+      "owner": "vercel-labs",
+      "repo": "skills",
+      "canonical_url": "https://skills.sh/vercel-labs/skills/find-skills",
+      "total_installs": 12345,
+      "weekly_installs": 678,
+      "weekly_installs_raw": "678",
+      "platform_installs": {"codex": 250, "opencode": 300},
+      "name": "find-skills",
+      "description": "Find installable skills",
+      "first_seen_date": "2026-01-26",
+      "github_url": "https://github.com/vercel-labs/skills",
+      "og_image_url": null,
+      "run_id": "20260217T000000Z",
+      "fetched_at": "2026-02-17T00:00:00Z",
+      "discovery_source": "all_time_api",
+      "source_endpoint": "all_time_api",
+      "discovery_pass": 1,
+      "rank_at_fetch": 1,
+      "http_status": 200,
+      "parser_version": "0.1.0",
+      "raw_html_hash": "abc"
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total": 1
+}

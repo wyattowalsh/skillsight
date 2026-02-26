@@ -1,0 +1,28 @@
+name: Dataset Mirrors
+
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: dataset-mirrors
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    if: ${{ vars.ENABLE_DATASET_MIRRORS == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+      - run: uv sync --dev --locked
+      - name: Publish dataset mirrors (scaffold)
+        env:
+          SKILLSIGHT_OUTPUT_DIR: ${{ vars.SKILLSIGHT_OUTPUT_DIR }}
+          SKILLSIGHT_GITHUB_RELEASE_ENABLED: ${{ vars.SKILLSIGHT_GITHUB_RELEASE_ENABLED }}
+          SKILLSIGHT_GITHUB_RELEASE_REPO: ${{ vars.SKILLSIGHT_GITHUB_RELEASE_REPO }}
+          SKILLSIGHT_KAGGLE_PUBLISH_ENABLED: ${{ vars.SKILLSIGHT_KAGGLE_PUBLISH_ENABLED }}
+          SKILLSIGHT_KAGGLE_DATASET_SLUG: ${{ vars.SKILLSIGHT_KAGGLE_DATASET_SLUG }}
+        run: uv run skillsight publish-datasets

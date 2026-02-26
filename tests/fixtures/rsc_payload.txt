@@ -1,0 +1,2 @@
+<script>self.__next_f.push([1,"[{\"id\":\"rsc1\",\"skillId\":\"rsc-skill-one\",\"name\":\"RSC Skill One\",\"installs\":5000,\"source\":\"rscowner/rscrepo\"},{\"id\":\"rsc2\",\"skillId\":\"rsc-skill-two\",\"name\":\"RSC Skill Two\",\"installs\":3000,\"source\":\"rscowner/rscrepo\"}]"])</script>
+<script>self.__next_f.push([1,"{\"id\":\"rsc3\",\"skillId\":\"rsc-skill-three\",\"name\":\"RSC Skill Three\",\"installs\":1000,\"source\":\"otherowner/otherrepo\"}"])</script>

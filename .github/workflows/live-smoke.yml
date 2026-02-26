@@ -1,0 +1,28 @@
+name: Live Smoke Checks
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: live-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Run live smoke checks
+        env:
+          SMOKE_SEARCH_URL: ${{ secrets.SMOKE_SEARCH_URL }}
+          SMOKE_WORKER_URL: ${{ secrets.SMOKE_WORKER_URL }}
+          SMOKE_DATA_URL: ${{ secrets.SMOKE_DATA_URL }}
+          SMOKE_WEB_URL: ${{ secrets.SMOKE_WEB_URL }}
+          SMOKE_SEARCH_PATH: ${{ vars.SMOKE_SEARCH_PATH }}
+          SMOKE_WORKER_PATH: ${{ vars.SMOKE_WORKER_PATH }}
+          SMOKE_DATA_PATH: ${{ vars.SMOKE_DATA_PATH }}
+          SMOKE_WEB_PATH: ${{ vars.SMOKE_WEB_PATH }}
+        run: bash scripts/live-smoke-check.sh

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillsight.dev/contracts/static_latest.schema.json",
+  "title": "StaticLatestManifest",
+  "type": "object",
+  "required": ["format_version", "snapshot_date", "generated_at", "page_size", "sort_modes", "counts", "paths", "checksums"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "snapshot_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "page_size": { "type": "integer", "minimum": 1 },
+    "sort_modes": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["installs", "weekly", "name"] },
+      "minItems": 3
+    },
+    "counts": {
+      "type": "object",
+      "required": ["total_skills", "total_repos"],
+      "properties": {
+        "total_skills": { "type": "integer", "minimum": 0 },
+        "total_repos": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "paths": {
+      "type": "object",
+      "required": ["stats_summary", "leaderboard_page_template", "skill_detail_template", "metrics_template"],
+      "properties": {
+        "stats_summary": { "type": "string" },
+        "leaderboard_page_template": {
+          "type": "string",
+          "description": "Template for leaderboard pages using a 1-based zero-padded 4-digit page token: {page_zero_padded_4}"
+        },
+        "skill_detail_template": { "type": "string" },
+        "metrics_template": { "type": "string" },
+        "search_slim_index": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "checksums": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+    }
+  },
+  "additionalProperties": true
+}

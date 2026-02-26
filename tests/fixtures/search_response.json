@@ -1,0 +1,25 @@
+{
+  "skills": [
+    {
+      "id": "abc123",
+      "skillId": "test-skill",
+      "name": "Test Skill",
+      "installs": 1500,
+      "source": "testowner/testrepo"
+    },
+    {
+      "id": "def456",
+      "skillId": "another-skill",
+      "name": "Another Skill",
+      "installs": 800,
+      "source": "testowner/testrepo"
+    },
+    {
+      "id": "ghi789",
+      "skillId": "third-skill",
+      "name": "Third Skill",
+      "installs": 200,
+      "source": "otherowner/otherrepo"
+    }
+  ]
+}

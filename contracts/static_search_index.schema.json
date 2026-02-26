@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillsight.dev/contracts/static_search_index.schema.json",
+  "title": "StaticSearchIndex",
+  "type": "object",
+  "required": ["snapshot_date", "items"],
+  "properties": {
+    "snapshot_date": { "type": "string", "format": "date" },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SearchIndexItem" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "SearchIndexItem": {
+      "type": "object",
+      "required": ["id", "skill_id", "owner", "repo", "name", "canonical_url"],
+      "properties": {
+        "id": { "type": "string" },
+        "skill_id": { "type": "string" },
+        "owner": { "type": "string" },
+        "repo": { "type": "string" },
+        "name": { "type": "string" },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "total_installs": { "type": ["integer", "null"] },
+        "weekly_installs": { "type": ["integer", "null"] },
+        "rank_at_fetch": { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

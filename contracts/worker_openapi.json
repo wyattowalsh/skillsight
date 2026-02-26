@@ -1,0 +1,176 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Skillsight Worker API",
+    "version": "v1"
+  },
+  "paths": {
+    "/v1/skills": {
+      "get": {
+        "summary": "List skills",
+        "parameters": [
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1}},
+          {"name": "page_size", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 200}},
+          {"name": "q", "in": "query", "schema": {"type": "string"}},
+          {"name": "sort", "in": "query", "schema": {"type": "string", "enum": ["installs", "weekly", "name"]}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill list",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/SkillListResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/skills/{id}": {
+      "get": {
+        "summary": "Get one skill",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill details",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/SkillRecord"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stats/summary": {
+      "get": {
+        "summary": "Summary stats",
+        "responses": {
+          "200": {
+            "description": "Summary",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/StatsSummary"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/metrics/{id}": {
+      "get": {
+        "summary": "Skill metrics",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "from", "in": "query", "schema": {"type": "string", "format": "date"}},
+          {"name": "to", "in": "query", "schema": {"type": "string", "format": "date"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Metrics series",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/MetricsResponse"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PlatformInstalls": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "opencode": {"type": ["integer", "null"]},
+          "codex": {"type": ["integer", "null"]},
+          "gemini_cli": {"type": ["integer", "null"]},
+          "github_copilot": {"type": ["integer", "null"]},
+          "amp": {"type": ["integer", "null"]},
+          "kimi_cli": {"type": ["integer", "null"]}
+        }
+      },
+      "SkillRecord": {
+        "type": "object",
+        "required": ["id", "skill_id", "owner", "repo", "canonical_url", "name", "run_id", "fetched_at", "discovery_source", "source_endpoint", "discovery_pass", "parser_version"],
+        "properties": {
+          "id": {"type": "string"},
+          "skill_id": {"type": "string"},
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "canonical_url": {"type": "string", "format": "uri"},
+          "total_installs": {"type": ["integer", "null"]},
+          "weekly_installs": {"type": ["integer", "null"]},
+          "weekly_installs_raw": {"type": ["string", "null"]},
+          "platform_installs": {"$ref": "#/components/schemas/PlatformInstalls"},
+          "name": {"type": "string"},
+          "description": {"type": ["string", "null"]},
+          "first_seen_date": {"type": ["string", "null"], "format": "date"},
+          "github_url": {"type": ["string", "null"], "format": "uri"},
+          "og_image_url": {"type": ["string", "null"], "format": "uri"},
+          "run_id": {"type": "string"},
+          "fetched_at": {"type": "string", "format": "date-time"},
+          "discovery_source": {"type": "string", "enum": ["all_time_api", "repo_page", "search_api", "sitemap", "browser", "leaderboard"]},
+          "source_endpoint": {"type": "string", "enum": ["all_time_api", "repo_page", "search_api", "sitemap", "browser", "leaderboard"]},
+          "discovery_pass": {"type": "integer", "minimum": 1},
+          "rank_at_fetch": {"type": ["integer", "null"], "minimum": 1},
+          "http_status": {"type": ["integer", "null"]},
+          "parser_version": {"type": "string"},
+          "raw_html_hash": {"type": ["string", "null"]},
+          "skill_md_content": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+          "skill_md_frontmatter": {"anyOf": [{"type": "object"}, {"type": "null"}]},
+          "install_command": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+          "categories": {"type": "array", "items": {"type": "string"}, "default": []}
+        }
+      },
+      "SkillListResponse": {
+        "type": "object",
+        "required": ["items", "page", "page_size", "total"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/SkillRecord"}
+          },
+          "page": {"type": "integer", "minimum": 1},
+          "page_size": {"type": "integer", "minimum": 1},
+          "total": {"type": "integer", "minimum": 0}
+        }
+      },
+      "StatsSummary": {
+        "type": "object",
+        "required": ["total_skills", "total_repos", "snapshot_date"],
+        "properties": {
+          "total_skills": {"type": "integer", "minimum": 0},
+          "total_repos": {"type": "integer", "minimum": 0},
+          "snapshot_date": {"type": "string", "format": "date"}
+        }
+      },
+      "SkillMetric": {
+        "type": "object",
+        "required": ["id", "snapshot_date"],
+        "properties": {
+          "id": {"type": "string"},
+          "snapshot_date": {"type": "string", "format": "date"},
+          "total_installs": {"type": ["integer", "null"]},
+          "weekly_installs": {"type": ["integer", "null"]},
+          "platform_installs": {"$ref": "#/components/schemas/PlatformInstalls"}
+        }
+      },
+      "MetricsResponse": {
+        "type": "object",
+        "required": ["id", "items"],
+        "properties": {
+          "id": {"type": "string"},
+          "items": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/SkillMetric"}
+          }
+        }
+      }
+    }
+  }
+}
